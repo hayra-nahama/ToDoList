@@ -1,24 +1,61 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import TodoTask from "./components/TodoTask";
+import { ITask } from "./interface";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import "./styles/styles.css";
+import React from "react";
 
 function App() {
+  const [task, setTask] = useState("");
+
+  const [todoList, setTodoList] = useState<ITask[]>([]);
+
+  function addTask(): void {
+    if (task === "") {
+      toast.error("Digite uma nova task");
+    } else {
+      const idRandom = (num: number) => Math.floor(Math.random() * num);
+
+      const newTask = { id: idRandom(999999999999999999), nameTask: task };
+
+      setTodoList([...todoList, newTask]);
+
+      toast.success("Task cadastrada com sucesso");
+    }
+  }
+
+  function deleteTask(DeleteTaskById: number): void {
+    setTodoList(todoList.filter((taskName) => taskName.id !== DeleteTaskById));
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+      <ToastContainer autoClose={2500} pauseOnHover={false} />
+      <header>
+        <h2>Lists</h2>
+
+        <input
+          type="text"
+          autoComplete="off"
+          placeholder="Escrever task..."
+          name="task"
+          className="input"
+          value={task}
+          onChange={(event) => setTask(event.target.value)}
+        />
+
+        <button type="submit" onClick={addTask} className="btn-header">
+          Adicionar Task
+        </button>
       </header>
+
+      <div className="line"></div>
+
+      {todoList.map((task, key) => (
+        <TodoTask key={key} task={task} deleteTask={deleteTask} />
+      ))}
     </div>
   );
 }
